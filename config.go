@@ -29,8 +29,7 @@ func Load(configName string, adapterName ...string) (cf config.Configer, err err
 		return
 	}
 
-	// beego 1.6 support beego.BConfig.RunMode
-	configFile := filepath.Join("conf", beego.AppConfig.String("RunMode"), adapterFile)
+	configFile := filepath.Join("conf", beego.BConfig.RunMode, adapterFile)
 
 	if !fileExist(configFile) {
 		configFile = filepath.Join("conf", adapterFile)
