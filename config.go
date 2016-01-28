@@ -3,51 +3,37 @@ package beeconfig
 
 import (
 	"errors"
-	"fmt"
-	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/config"
+	"github.com/astaxie/beego/utils"
 )
 
-const defaultAdapter = "json"
-
-var configMap map[string]config.Configer
+var (
+	configFiles map[string]config.Configer
+)
 
 // Load return Configer
-func Load(configName string, adapterName ...string) (cf config.Configer, err error) {
-
-	adapter := defaultAdapter
-	if len(adapterName) > 0 {
-		adapter = adapterName[0]
-	}
-
-	adapterFile := fmt.Sprintf("%s.%s", configName, adapter)
-	if c, ok := configMap[adapterFile]; ok {
+// you can load the specific config file by run mode
+func Load(configFile string) (cf config.Configer, err error) {
+	if c, ok := configFiles[configFile]; ok {
 		cf = c
 		return
 	}
-
-	configFile := filepath.Join("conf", beego.BConfig.RunMode, adapterFile)
-
-	if !fileExist(configFile) {
-		configFile = filepath.Join("conf", adapterFile)
-		if !fileExist(configFile) {
-			err = errors.New("file not exist:" + configFile)
+	fullPathFile := filepath.Join("conf", beego.BConfig.RunMode, configFile)
+	if !utils.FileExists(fullPathFile) {
+		fullPathFile = filepath.Join("conf", configFile)
+		if !utils.FileExists(fullPathFile) {
+			err = errors.New(fullPathFile + " not found")
 			return
 		}
 	}
-
-	cf, err = config.NewConfig(adapter, configFile)
+	adapter := strings.TrimLeft(filepath.Ext(fullPathFile), ".")
+	cf, err = config.NewConfig(adapter, fullPathFile)
 	if err != nil {
-		configMap[adapterFile] = cf
+		configFiles[configFile] = cf
 	}
-
 	return
-}
-
-func fileExist(filename string) bool {
-	_, err := os.Stat(filename)
-	return err == nil || os.IsExist(err)
 }
