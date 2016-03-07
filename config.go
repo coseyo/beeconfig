@@ -15,6 +15,10 @@ var (
 	configFiles map[string]config.Configer
 )
 
+func init() {
+	configFiles = make(map[string]config.Configer)
+}
+
 // Load return Configer
 // you can load the specific config file by run mode
 func Load(configFile string) (cf config.Configer, err error) {
