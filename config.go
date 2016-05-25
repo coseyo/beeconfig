@@ -41,3 +41,46 @@ func Load(configFile string) (cf config.Configer, err error) {
 	}
 	return
 }
+
+// ParseDIYToMap is used to convert the json object to map[string]string
+func ParseDIYToMap(cf config.Configer, name string) (m map[string]string, err error) {
+	DIY, err := cf.DIY(name)
+	if err != nil {
+		return
+	}
+	itf, ok := DIY.(map[string]interface{})
+	if !ok {
+		err = errors.New("value is not map[string]interface{}")
+		return
+	}
+	m = make(map[string]string)
+	for k, v := range itf {
+		m[k] = v.(string)
+	}
+	return
+}
+
+// ParseDIYToMap is used to convert the json object to map[string]map[string]string
+func ParseDIYToMaps(cf config.Configer, name string) (m map[string]map[string]string, err error) {
+	DIY, err := cf.DIY(name)
+	if err != nil {
+		return
+	}
+	itf, ok := DIY.(map[string]interface{})
+	if !ok {
+		err = errors.New("value is not map[string]interface{}")
+		return
+	}
+	m = make(map[string]map[string]string)
+
+	for k, v := range itf {
+		mTmp := v.(map[string]interface{})
+		for k2, v2 := range mTmp {
+			if _, exist := m[k]; !exist {
+				m[k] = make(map[string]string)
+			}
+			m[k][k2] = v2.(string)
+		}
+	}
+	return
+}

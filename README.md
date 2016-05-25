@@ -27,3 +27,5 @@ cf, err := beeconfig.Load("database.ini")
 It will load conf/dev/database.ini if you run in dev mode, or load conf/prod/database.ini in prod mode.
 
 If can not find the file in above dir, it will load conf/database.ini.
+
+- add func ParseDIYToMap and ParseDIYToMaps to convert json object to golang map
